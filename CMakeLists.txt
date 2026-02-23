@@ -56,6 +56,19 @@ ExternalProject_Add(ep_libpng
     DEPENDS ep_zlib
 )
 
+# --- libjpeg-turbo ---
+ExternalProject_Add(ep_libjpeg_turbo
+    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/extern/libjpeg-turbo"
+    CMAKE_ARGS
+        ${COMMON_CMAKE_ARGS}
+        -DENABLE_SHARED=OFF
+        -DENABLE_STATIC=ON
+        -DWITH_TURBOJPEG=OFF
+        -DWITH_TOOLS=OFF
+        -DWITH_TESTS=OFF
+    INSTALL_DIR "${STAGING_PREFIX}"
+)
+
 # --- libtiff ---
 ExternalProject_Add(ep_libtiff
     SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/extern/libtiff"
@@ -73,11 +86,11 @@ ExternalProject_Add(ep_libtiff
         -Dlzma=OFF
         -Dwebp=OFF
         -Dzstd=OFF
-        -Djpeg=OFF
+        -Djpeg=ON
         -Dcxx=OFF
         -Dlibdeflate=OFF
     INSTALL_DIR "${STAGING_PREFIX}"
-    DEPENDS ep_zlib
+    DEPENDS ep_zlib ep_libjpeg_turbo
 )
 
 # libtiff v4.7.0 static builds export CMath::CMath and ZLIB::ZLIB as link
@@ -108,7 +121,7 @@ ExternalProject_Add(ep_leptonica
         -DCMAKE_PROJECT_INCLUDE=${PRELOAD_DEPS}
         -DBUILD_SHARED_LIBS=OFF
         -DBUILD_PROG=OFF
-        -DENABLE_JPEG=OFF
+        -DENABLE_JPEG=ON
         -DENABLE_GIF=OFF
         -DENABLE_TIFF=ON
         -DENABLE_WEBP=OFF
@@ -116,7 +129,7 @@ ExternalProject_Add(ep_leptonica
         -DENABLE_ZLIB=ON
         -DENABLE_PNG=ON
     INSTALL_DIR "${STAGING_PREFIX}"
-    DEPENDS ep_libpng ep_libtiff
+    DEPENDS ep_libpng ep_libtiff ep_libjpeg_turbo
 )
 
 # --- tesseract ---
