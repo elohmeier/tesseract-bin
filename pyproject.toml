@@ -1,0 +1,33 @@
+[build-system]
+requires = ["scikit-build-core>=0.10"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "tesseract-bin"
+version = "5.5.2"
+description = "Tesseract OCR binary distribution"
+requires-python = ">=3.9"
+license = "Apache-2.0"
+
+[project.scripts]
+tesseract = "tesseract_bin:tesseract"
+
+[project.urls]
+Homepage = "https://github.com/elohmeier/tesseract-bin"
+Repository = "https://github.com/elohmeier/tesseract-bin"
+
+[tool.scikit-build]
+wheel.py-api = "py3"
+wheel.install-dir = "tesseract_bin/data"
+wheel.packages = ["src/tesseract_bin"]
+install.strip = true
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+build_command = ""
+
+[tool.cibuildwheel]
+archs = ["auto64"]
+build = ["cp313-*"]
+skip = "*-musllinux*"
+test-command = "tesseract --version && python -c \"import tesseract_bin; print(tesseract_bin.TESSERACT_PATH)\""
