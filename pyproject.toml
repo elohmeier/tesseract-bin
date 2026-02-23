@@ -40,3 +40,8 @@ archs = ["auto64"]
 build = ["cp313-*", "cp314-*"]
 skip = "*-musllinux*"
 test-command = "tesseract --version && python -c \"import tesseract_bin; print(tesseract_bin.TESSERACT_PATH)\""
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]

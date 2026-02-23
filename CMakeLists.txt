@@ -150,6 +150,23 @@ ExternalProject_Add(ep_tesseract
     DEPENDS ep_leptonica
 )
 
+# --- tessdata (language models) ---
+set(TESSDATA_FAST_URL "https://github.com/tesseract-ocr/tessdata_fast/raw/refs/tags/4.1.0")
+
+file(DOWNLOAD "${TESSDATA_FAST_URL}/eng.traineddata"
+    "${CMAKE_BINARY_DIR}/tessdata/eng.traineddata"
+    EXPECTED_HASH SHA256=7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2)
+
+file(DOWNLOAD "${TESSDATA_FAST_URL}/deu.traineddata"
+    "${CMAKE_BINARY_DIR}/tessdata/deu.traineddata"
+    EXPECTED_HASH SHA256=19d219bbb6672c869d20a9636c6816a81eb9a71796cb93ebe0cb1530e2cdb22d)
+
+install(FILES
+    "${CMAKE_BINARY_DIR}/tessdata/eng.traineddata"
+    "${CMAKE_BINARY_DIR}/tessdata/deu.traineddata"
+    DESTINATION share/tessdata
+)
+
 # --- Install tesseract binary into the wheel ---
 install(PROGRAMS "${STAGING_PREFIX}/bin/tesseract" DESTINATION bin)
 
