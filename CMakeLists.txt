@@ -56,22 +56,67 @@ ExternalProject_Add(ep_libpng
     DEPENDS ep_zlib
 )
 
+# --- libtiff ---
+ExternalProject_Add(ep_libtiff
+    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/extern/libtiff"
+    CMAKE_ARGS
+        ${COMMON_CMAKE_ARGS}
+        -DBUILD_SHARED_LIBS=OFF
+        -Dtiff-tools=OFF
+        -Dtiff-tests=OFF
+        -Dtiff-contrib=OFF
+        -Dtiff-docs=OFF
+        -Dtiff-deprecated=OFF
+        -Dtiff-install=ON
+        -Djbig=OFF
+        -Dlerc=OFF
+        -Dlzma=OFF
+        -Dwebp=OFF
+        -Dzstd=OFF
+        -Djpeg=OFF
+        -Dcxx=OFF
+        -Dlibdeflate=OFF
+    INSTALL_DIR "${STAGING_PREFIX}"
+    DEPENDS ep_zlib
+)
+
+# libtiff v4.7.0 static builds export CMath::CMath and ZLIB::ZLIB as link
+# dependencies in TiffTargets.cmake but TiffConfig.cmake has a TODO to call
+# find_dependency() for them. Copy FindCMath.cmake into the installed tiff
+# cmake dir and patch TiffConfig.cmake to import it before loading targets.
+ExternalProject_Add_Step(ep_libtiff fix_cmake_config
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_CURRENT_SOURCE_DIR}/extern/libtiff/cmake/FindCMath.cmake"
+        "${STAGING_PREFIX}/lib/cmake/tiff/FindCMath.cmake"
+    COMMAND ${CMAKE_COMMAND}
+        -DTIFF_CONFIG=${STAGING_PREFIX}/lib/cmake/tiff/TiffConfig.cmake
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch-tiff-config.cmake"
+    DEPENDEES install
+    COMMENT "Patching TiffConfig.cmake to resolve CMath::CMath for static linking"
+)
+
+# Preload script ensures transitive dependency targets (ZLIB::ZLIB,
+# CMath::CMath, etc.) are available when consuming statically-linked
+# libtiff and leptonica configs that omit find_dependency() calls.
+set(PRELOAD_DEPS "${CMAKE_CURRENT_SOURCE_DIR}/cmake/preload-deps.cmake")
+
 # --- leptonica ---
 ExternalProject_Add(ep_leptonica
     SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/extern/leptonica"
     CMAKE_ARGS
         ${COMMON_CMAKE_ARGS}
+        -DCMAKE_PROJECT_INCLUDE=${PRELOAD_DEPS}
         -DBUILD_SHARED_LIBS=OFF
         -DBUILD_PROG=OFF
         -DENABLE_JPEG=OFF
         -DENABLE_GIF=OFF
-        -DENABLE_TIFF=OFF
+        -DENABLE_TIFF=ON
         -DENABLE_WEBP=OFF
         -DENABLE_OPENJPEG=OFF
         -DENABLE_ZLIB=ON
         -DENABLE_PNG=ON
     INSTALL_DIR "${STAGING_PREFIX}"
-    DEPENDS ep_libpng
+    DEPENDS ep_libpng ep_libtiff
 )
 
 # --- tesseract ---
@@ -79,10 +124,11 @@ ExternalProject_Add(ep_tesseract
     SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/extern/tesseract"
     CMAKE_ARGS
         ${COMMON_CMAKE_ARGS}
+        -DCMAKE_PROJECT_INCLUDE=${PRELOAD_DEPS}
         -DBUILD_SHARED_LIBS=OFF
         -DBUILD_TRAINING_TOOLS=OFF
         -DBUILD_TESTS=OFF
-        -DDISABLE_TIFF=ON
+        -DDISABLE_TIFF=OFF
         -DDISABLE_ARCHIVE=ON
         -DDISABLE_CURL=ON
         -DGRAPHICS_DISABLED=ON

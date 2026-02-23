@@ -10,3 +10,6 @@
 [submodule "extern/zlib"]
 	path = extern/zlib
 	url = https://github.com/madler/zlib.git
+[submodule "extern/libtiff"]
+	path = extern/libtiff
+	url = https://gitlab.com/libtiff/libtiff.git

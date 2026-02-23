@@ -17,7 +17,15 @@ Homepage = "https://github.com/elohmeier/tesseract-bin"
 Repository = "https://github.com/elohmeier/tesseract-bin"
 
 [tool.scikit-build]
-sdist.include = ["extern/zlib/zconf.h"]
+sdist.include = [
+    "extern/zlib/zconf.h",
+    "extern/zlib/Makefile",
+    "extern/libtiff/build/**",
+    "extern/leptonica/m4/**",
+    "extern/leptonica/prog/pdf2*",
+    "extern/leptonica/prog/ps2*",
+    "extern/tesseract/m4/**",
+]
 wheel.py-api = "py3"
 wheel.install-dir = "tesseract_bin/data"
 wheel.packages = ["src/tesseract_bin"]
