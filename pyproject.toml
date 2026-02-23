@@ -28,6 +28,6 @@ build_command = ""
 
 [tool.cibuildwheel]
 archs = ["auto64"]
-build = ["cp313-*"]
+build = ["cp313-*", "cp314-*"]
 skip = "*-musllinux*"
 test-command = "tesseract --version && python -c \"import tesseract_bin; print(tesseract_bin.TESSERACT_PATH)\""
